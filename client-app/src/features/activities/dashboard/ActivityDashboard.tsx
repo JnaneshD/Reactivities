@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, GridColumn, List } from "semantic-ui-react";
+import { Grid, GridColumn } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
 import ActivityList from "./ActivityList";
 import ActivityDetail from "../details/ActivityDetails";
@@ -25,7 +25,7 @@ export default function ActivityDashboard({ activities, selectActivity, cancelSe
             </Grid.Column>
             <GridColumn width="6">
                 {selectedActivity && !editMode && <ActivityDetail activity={selectedActivity} cancelSelectActivity={cancelSelectActivity} openForm={openForm}/>}
-                {editMode && <ActivityForm closeForm={closeForm} Activity={selectedActivity}/>}
+                {editMode && <ActivityForm closeForm={closeForm} selectedActivity={selectedActivity}/>}
             </GridColumn>
         </Grid>
     )

@@ -21,20 +21,22 @@ function App() {
       setTimeout(() => {
         setActivities(response.data);
         setFormLoaded(true);
-      }, 5000);
+      }, 1000);
 
     })
   }, []);
 
   function handleSelectActivity(id: string) {
     setSelectedActivity(activities.find(x => x.id === id));
+    setEditMode(false);
   }
   function handleCancelSelectActivity() {
     setSelectedActivity(undefined);
     setEditMode(false);
   }
-  // here create the functions that will take care of the Edit form 
+  // here create the functions that will take care of the Edit form visibility
   function handleFormOpen(id?: string) {
+    console.log(id);
     id ? handleSelectActivity(id) : handleCancelSelectActivity();
     setEditMode(true);
   }
