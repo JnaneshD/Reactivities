@@ -6,9 +6,10 @@ import ConfirmDialog from "../details/ConfirmDialog";
 interface Props {
     selectedActivity: Activity | undefined;
     closeForm: () => void;
+    createOrEdit: (activity: Activity) =>void;
 }
 
-export default function ActivityForm({selectedActivity, closeForm}: Props) {
+export default function ActivityForm({selectedActivity, closeForm, createOrEdit}: Props) {
 
     // Handle populating data for edit
     const initialState = selectedActivity ?? {
@@ -40,6 +41,7 @@ export default function ActivityForm({selectedActivity, closeForm}: Props) {
         // This is where you would perform the actual delete logic
         // After that, you can hide the dialog
         setShowConfirmDialog(false);
+        createOrEdit(activity);
     };
     function handleInputChange(event: ChangeEvent<HTMLInputElement| HTMLTextAreaElement>){
        const {name, value} = event.target;
