@@ -1,9 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button, Container, Menu } from "semantic-ui-react";
 
-function ButtonClicked() {
-    console.log("Button clicked");
-}
 
 interface Props{
     openForm: () => void;

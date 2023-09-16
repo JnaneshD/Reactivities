@@ -1,8 +1,6 @@
-import React, { useState } from "react";
-import { Card, Image, Icon, Button } from "semantic-ui-react";
+import React from "react";
+import { Card, Image,  Button } from "semantic-ui-react";
 import { Activity } from "../../../app/models/activity";
-import ConfirmDialog from "./ConfirmDialog";
-import ActivityForm from "../form/ActivityForm";
 
 
 interface Proper {

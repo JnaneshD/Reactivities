@@ -1,14 +1,15 @@
 import React from "react";
 import { Activity } from "../../../app/models/activity";
-import { Button, Container, Item, Label, Segment } from "semantic-ui-react";
+import { Button, Container, Item, Label } from "semantic-ui-react";
 
 interface Props {
     activities: Activity[];
     selectActivity: (id: string) => void;
     cancelSelectActivity: () => void;
+    deleteActivity: (id: string) => void;
 }
 
-export default function ActivityList({ activities,  selectActivity, cancelSelectActivity }: Props) {
+export default function ActivityList({ activities,  selectActivity, cancelSelectActivity, deleteActivity }: Props) {
     return (
         <>
             <Container >
@@ -29,6 +30,7 @@ export default function ActivityList({ activities,  selectActivity, cancelSelect
                                 </Item.Description>
                                 <Item.Extra>
                                     <Button onClick={() => selectActivity(activity.id)} floated="right" content="View" color="purple"></Button>
+                                    <Button onClick={() => deleteActivity(activity.id)} floated="right" content="Delete" color="red"></Button>
                                     <Label basic content={activity.category} color="red" size="large"></Label>
                                 </Item.Extra>
                             </Item.Content>
