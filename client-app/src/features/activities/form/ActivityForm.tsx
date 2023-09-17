@@ -7,9 +7,10 @@ interface Props {
     selectedActivity: Activity | undefined;
     closeForm: () => void;
     createOrEdit: (activity: Activity) =>void;
+    submitting: boolean;
 }
 
-export default function ActivityForm({selectedActivity, closeForm, createOrEdit}: Props) {
+export default function ActivityForm({selectedActivity, closeForm, createOrEdit, submitting}: Props) {
 
     // Handle populating data for edit
     const initialState = selectedActivity ?? {
@@ -56,8 +57,8 @@ export default function ActivityForm({selectedActivity, closeForm, createOrEdit}
                 <Form.Input type="date" placeholder="Date" value={activity.date} name="date" onChange={handleInputChange}/>
                 <Form.Input placeholder="City" value={activity.city} name="city" onChange={handleInputChange}/>
                 <Form.Input placeholder="Venue" value={activity.venue} name="venue" onChange={handleInputChange}/>
-                <Button floated="right" positive type="submit" content="Submit"/>
-                <Button floated="right" type="button" content="Cancel" onClick={closeForm}/>
+                <Button loading={submitting} floated="right" positive type="submit" content="Submit"/>
+                <Button disabled={submitting} floated="right" type="button" content="Cancel" onClick={closeForm}/>
             </Form>
             <ConfirmDialog
                 message="Are you sure you want to edit this item?"

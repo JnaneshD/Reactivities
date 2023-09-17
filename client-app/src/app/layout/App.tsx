@@ -14,6 +14,7 @@ function App() {
   const [editMode, setEditMode] = useState(false);
   const [formLoaded, setFormLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     // this will be called when the application loads because we do not have anything in the parameters and dependencies. 
@@ -26,7 +27,7 @@ function App() {
         })
         setActivities(activities);
         setFormLoaded(true);
-        //setLoading(true);
+        setLoading(true);
 
     })
   }, []);
@@ -52,16 +53,34 @@ function App() {
 
   function handleCreateOrEditActivity(activity: Activity)
   {
-    // Check the presence of activity ID
-    activity.id ? setActivities([...activities.filter(x => x.id = activity.id), activity])
-    : setActivities([...activities, {...activity, id: uuid()}]);
-    setEditMode(false);
-    setSelectedActivity(activity);
+    setSubmitting(true);
+    if(activity.id)
+    {
+      agent.Activities.update(activity).then(() => {
+        setSelectedActivity(activity);
+        setEditMode(false);
+        setSubmitting(false);
+        setActivities([...activities.filter(x => x.id !== activity.id), activity])
+      })
+    }
+    else{
+      activity.id = uuid();
+      agent.Activities.create(activity).then(() =>{
+        setActivities([...activities, activity]);
+        setEditMode(false);
+        setSubmitting(false);
+      });
+      
+    }
   }
 
   function handleDeleteActivity(id: string)
   {
-    setActivities([...activities.filter(x => x.id !== id)]);
+    setSubmitting(true);
+    agent.Activities.delete(id).then(()=>{
+      setActivities([...activities.filter(x => x.id !== id)]);
+      setSubmitting(false);
+    });
   }
 
   return (
@@ -81,7 +100,8 @@ function App() {
               openForm={handleFormOpen}
               closeForm={handleFormClose}
               createOrEdit={handleCreateOrEditActivity} 
-              deleteActivity={handleDeleteActivity}/>
+              deleteActivity={handleDeleteActivity}
+              submitting={submitting}/>
           </Container>
         </div>
       ) :
