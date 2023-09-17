@@ -1,27 +1,32 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import axios from 'axios';
 import { Header, Container, Segment } from 'semantic-ui-react';
 import { Activity } from '../models/activity';
 import NavBar from './navbar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
 import { Puff } from 'react-loader-spinner';
 import { v4 as uuid } from 'uuid';
+import agent from '../api/agent';
+import LoadingComponent from './LoadingComponents';
 
 function App() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
   const [editMode, setEditMode] = useState(false);
   const [formLoaded, setFormLoaded] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // this will be called when the application loads because we do not have anything in the parameters and dependencies. 
     // Also if we dont have a condition it will keep on firing the requests so to avoid that behavior 
-
-    axios.get("http://localhost:5000/api/activities").then(response => {
-      setTimeout(() => {
-        setActivities(response.data);
+    agent.Activities.list().then(response => {
+      let activities: Activity[] = [];
+        response.forEach(activity => {
+          activity.date = activity.date.split('T')[0];
+          activities.push(activity);
+        })
+        setActivities(activities);
         setFormLoaded(true);
-      }, 1000);
+        //setLoading(true);
 
     })
   }, []);
@@ -63,7 +68,7 @@ function App() {
     <Fragment>
       <NavBar openForm={handleFormOpen}/>
 
-      {formLoaded ? (
+      {loading ? (
         <div>
           <Container style={{ marginTop: '7em' }}>
             <Header as="h1" content="Reactivities" icon="users" />
@@ -80,18 +85,19 @@ function App() {
           </Container>
         </div>
       ) :
-        <Segment textAlign='center' style={{ width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Puff
-            height="80"
-            width="80"
-            radius={1}
-            color="#4fa94d"
-            ariaLabel="puff-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </Segment>
+        // <Segment textAlign='center' style={{ width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        //   <Puff
+        //     height="80"
+        //     width="80"
+        //     radius={1}
+        //     color="#4fa94d"
+        //     ariaLabel="puff-loading"
+        //     wrapperStyle={{}}
+        //     wrapperClass=""
+        //     visible={true}
+        //   />
+        // </Segment>
+        <LoadingComponent content='Loading app'/>
       }
     </Fragment>
   );
