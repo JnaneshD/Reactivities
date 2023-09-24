@@ -1,6 +1,6 @@
 import React from "react";
 import { Puff } from 'react-loader-spinner';
-import { Dimmer, Header } from "semantic-ui-react";
+import { Dimmer } from "semantic-ui-react";
 
 interface Props {
     inverted?: boolean;

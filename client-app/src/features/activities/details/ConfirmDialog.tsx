@@ -1,6 +1,4 @@
-// ConfirmDialog.tsx
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import default styles
 
@@ -17,22 +15,24 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, dialo
     onConfirm(); // Call the onConfirm function on confirm
   };
 
-  if (dialogVisible) {
-    confirmAlert({
-      title: 'Confirm',
-      message: message,
-      buttons: [
-        {
-          label: 'Cancel',
-          onClick: closeDialog, // Close the dialog on cancel
-        },
-        {
-          label: 'Confirm',
-          onClick: handleConfirm,
-        },
-      ],
-    });
-  }
+  useEffect(() => {
+    if (dialogVisible) {
+      confirmAlert({
+        title: 'Confirm',
+        message: message,
+        buttons: [
+          {
+            label: 'Cancel',
+            onClick: closeDialog, // Close the dialog on cancel
+          },
+          {
+            label: 'Confirm',
+            onClick: handleConfirm,
+          },
+        ],
+      });
+    }
+  }, [dialogVisible, closeDialog, handleConfirm, message]);
 
   return null; // The component doesn't render anything directly
 };

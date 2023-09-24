@@ -1,19 +1,17 @@
 import React from "react";
 import { Card, Image,  Button } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
+import { useStore } from "../../../app/stores/store";
+import LoadingComponent from "../../../app/layout/LoadingComponents";
+import { observer } from "mobx-react-lite";
 
 
-interface Proper {
-    activity: Activity;
-    cancelSelectActivity: () => void;
-    openForm: (id: string) => void;
-
-}
-
-
-
-export default function ActivityDetail({ activity, cancelSelectActivity, openForm }: Proper) {
-
+export default observer(function ActivityDetail() {
+    const {activityStore} = useStore();
+    const {selectedActivity: activity, openForm, cancelSelectedActivity} = activityStore;
+    if(!activity)
+    {
+        return <LoadingComponent/>;
+    }
     return (
         <>
             <Card fluid>
@@ -30,11 +28,11 @@ export default function ActivityDetail({ activity, cancelSelectActivity, openFor
                 <Card.Content extra>
                     <Button.Group widths={2}>
                         <Button onClick={() => openForm(activity.id)} color="blue" content="Edit"></Button>
-                        <Button color="grey" content="Cancel" onClick={cancelSelectActivity}></Button>
+                        <Button color="grey" content="Cancel" onClick={cancelSelectedActivity}></Button>
                     </Button.Group>
                 </Card.Content>
             </Card>
             
         </>
     )
-}
+})

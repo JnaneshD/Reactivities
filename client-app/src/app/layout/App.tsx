@@ -1,107 +1,32 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Header, Container, Segment } from 'semantic-ui-react';
-import { Activity } from '../models/activity';
+import React, { Fragment, useEffect } from 'react';
+import { Header, Container } from 'semantic-ui-react';
 import NavBar from './navbar';
 import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
-import { Puff } from 'react-loader-spinner';
-import { v4 as uuid } from 'uuid';
-import agent from '../api/agent';
 import LoadingComponent from './LoadingComponents';
+import { useStore } from '../stores/store';
+import { observer } from 'mobx-react-lite';
 
 function App() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
-  const [editMode, setEditMode] = useState(false);
-  const [formLoaded, setFormLoaded] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const {activityStore} = useStore();
 
   useEffect(() => {
-    // this will be called when the application loads because we do not have anything in the parameters and dependencies. 
-    // Also if we dont have a condition it will keep on firing the requests so to avoid that behavior 
-    agent.Activities.list().then(response => {
-      let activities: Activity[] = [];
-        response.forEach(activity => {
-          activity.date = activity.date.split('T')[0];
-          activities.push(activity);
-        })
-        setActivities(activities);
-        setFormLoaded(true);
-        setLoading(true);
+    const fetchData = async () => {
+      await activityStore.loadActivities();
+    };
 
-    })
-  }, []);
+    fetchData();
+  }, [activityStore]);
 
-  function handleSelectActivity(id: string) {
-    setSelectedActivity(activities.find(x => x.id === id));
-    setEditMode(false);
-  }
-  function handleCancelSelectActivity() {
-    setSelectedActivity(undefined);
-    setEditMode(false);
-  }
-  // here create the functions that will take care of the Edit form visibility
-  function handleFormOpen(id?: string) {
-    console.log(id);
-    id ? handleSelectActivity(id) : handleCancelSelectActivity();
-    setEditMode(true);
-  }
-
-  function handleFormClose() {
-    setEditMode(false);
-  }
-
-  function handleCreateOrEditActivity(activity: Activity)
-  {
-    setSubmitting(true);
-    if(activity.id)
-    {
-      agent.Activities.update(activity).then(() => {
-        setSelectedActivity(activity);
-        setEditMode(false);
-        setSubmitting(false);
-        setActivities([...activities.filter(x => x.id !== activity.id), activity])
-      })
-    }
-    else{
-      activity.id = uuid();
-      agent.Activities.create(activity).then(() =>{
-        setActivities([...activities, activity]);
-        setEditMode(false);
-        setSubmitting(false);
-      });
-      
-    }
-  }
-
-  function handleDeleteActivity(id: string)
-  {
-    setSubmitting(true);
-    agent.Activities.delete(id).then(()=>{
-      setActivities([...activities.filter(x => x.id !== id)]);
-      setSubmitting(false);
-    });
-  }
 
   return (
     <Fragment>
-      <NavBar openForm={handleFormOpen}/>
+      <NavBar />
 
-      {loading ? (
+      {activityStore.loadingInitial === false ? (
         <div>
           <Container style={{ marginTop: '7em' }}>
             <Header as="h1" content="Reactivities" icon="users" />
-            <ActivityDashboard
-              activities={activities}
-              selectedActivity={selectedActivity}
-              selectActivity={handleSelectActivity}
-              cancelSelectActivity={handleCancelSelectActivity}
-              editMode={editMode}
-              openForm={handleFormOpen}
-              closeForm={handleFormClose}
-              createOrEdit={handleCreateOrEditActivity} 
-              deleteActivity={handleDeleteActivity}
-              submitting={submitting}/>
+            <ActivityDashboard/>
           </Container>
         </div>
       ) :
@@ -123,4 +48,4 @@ function App() {
   );
 }
 
-export default App;
+export default observer(App);

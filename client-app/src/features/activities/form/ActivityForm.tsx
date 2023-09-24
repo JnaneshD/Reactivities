@@ -1,16 +1,12 @@
 import React, { ChangeEvent, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
-import { Activity } from "../../../app/models/activity";
 import ConfirmDialog from "../details/ConfirmDialog";
+import { useStore } from "../../../app/stores/store";
+import { observer } from "mobx-react-lite";
 
-interface Props {
-    selectedActivity: Activity | undefined;
-    closeForm: () => void;
-    createOrEdit: (activity: Activity) =>void;
-    submitting: boolean;
-}
-
-export default function ActivityForm({selectedActivity, closeForm, createOrEdit, submitting}: Props) {
+export default observer(function ActivityForm() {
+    const {activityStore} = useStore();
+    const {selectedActivity, closeForm, createActivity, loading, updateActivity} = activityStore;
 
     // Handle populating data for edit
     const initialState = selectedActivity ?? {
@@ -29,7 +25,7 @@ export default function ActivityForm({selectedActivity, closeForm, createOrEdit,
 
     function handleSubmitClick() {
         setShowConfirmDialog(true);
-        console.log(activity);
+        
     };
 
     const handleCancel = () => {
@@ -42,7 +38,7 @@ export default function ActivityForm({selectedActivity, closeForm, createOrEdit,
         // This is where you would perform the actual delete logic
         // After that, you can hide the dialog
         setShowConfirmDialog(false);
-        createOrEdit(activity);
+        activity.id? updateActivity(activity) : createActivity(activity);
     };
     function handleInputChange(event: ChangeEvent<HTMLInputElement| HTMLTextAreaElement>){
        const {name, value} = event.target;
@@ -57,8 +53,8 @@ export default function ActivityForm({selectedActivity, closeForm, createOrEdit,
                 <Form.Input type="date" placeholder="Date" value={activity.date} name="date" onChange={handleInputChange}/>
                 <Form.Input placeholder="City" value={activity.city} name="city" onChange={handleInputChange}/>
                 <Form.Input placeholder="Venue" value={activity.venue} name="venue" onChange={handleInputChange}/>
-                <Button loading={submitting} floated="right" positive type="submit" content="Submit"/>
-                <Button disabled={submitting} floated="right" type="button" content="Cancel" onClick={closeForm}/>
+                <Button loading={loading} floated="right" positive type="submit" content="Submit"/>
+                <Button disabled={loading} floated="right" type="button" content="Cancel" onClick={closeForm}/>
             </Form>
             <ConfirmDialog
                 message="Are you sure you want to edit this item?"
@@ -68,4 +64,4 @@ export default function ActivityForm({selectedActivity, closeForm, createOrEdit,
             />
         </Segment>
     )
-}
+})
