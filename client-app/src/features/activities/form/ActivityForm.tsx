@@ -1,15 +1,20 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { Button, Form, Segment } from "semantic-ui-react";
 import ConfirmDialog from "../details/ConfirmDialog";
 import { useStore } from "../../../app/stores/store";
 import { observer } from "mobx-react-lite";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Activity } from "../../../app/models/activity";
+import LoadingComponent from "../../../app/layout/LoadingComponents";
+import {v4 as uuid} from 'uuid';
 
 export default observer(function ActivityForm() {
     const {activityStore} = useStore();
-    const {selectedActivity, closeForm, createActivity, loading, updateActivity} = activityStore;
+    const {createActivity, loading, updateActivity, loadActivity, loadingInitial} = activityStore;
+    const {id} = useParams();
+    const navigate = useNavigate();
 
-    // Handle populating data for edit
-    const initialState = selectedActivity ?? {
+    const [activity, setActivity] = useState<Activity>({
         id: '',
         title: '',
         category: '',
@@ -17,9 +22,13 @@ export default observer(function ActivityForm() {
         venue: '',
         date: '',
         city: ''
-    }
+    });
 
-    const [activity, setActivity] = useState(initialState);
+    useEffect(() => {
+        if (id) {
+            loadActivity(id).then(activity => setActivity(activity!))
+        }
+    }, [id, loadActivity]);
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -38,12 +47,21 @@ export default observer(function ActivityForm() {
         // This is where you would perform the actual delete logic
         // After that, you can hide the dialog
         setShowConfirmDialog(false);
-        activity.id? updateActivity(activity) : createActivity(activity);
+        if (!activity.id)
+        {
+            activity.id = uuid();
+            createActivity(activity).then(() => navigate(`/activities/${activity.id}`));
+        }
+        else{
+            updateActivity(activity).then(() => navigate(`/activities/${activity.id}`));
+        }
+        //activity.id? updateActivity(activity) : createActivity(activity);
     };
     function handleInputChange(event: ChangeEvent<HTMLInputElement| HTMLTextAreaElement>){
        const {name, value} = event.target;
        setActivity({...activity, [name]: value}) 
     }; 
+    if (loadingInitial) return <LoadingComponent content="Loading"/>
     return (
         <Segment clearing>
             <Form autoComplete="off" onSubmit={handleSubmitClick}>
@@ -54,7 +72,7 @@ export default observer(function ActivityForm() {
                 <Form.Input placeholder="City" value={activity.city} name="city" onChange={handleInputChange}/>
                 <Form.Input placeholder="Venue" value={activity.venue} name="venue" onChange={handleInputChange}/>
                 <Button loading={loading} floated="right" positive type="submit" content="Submit"/>
-                <Button disabled={loading} floated="right" type="button" content="Cancel" onClick={closeForm}/>
+                <Button disabled={loading} floated="right" type="button" content="Cancel" as={Link} to="/activities" />
             </Form>
             <ConfirmDialog
                 message="Are you sure you want to edit this item?"

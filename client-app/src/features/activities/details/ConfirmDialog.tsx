@@ -10,11 +10,6 @@ interface ConfirmDialogProps {
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, dialogVisible, closeDialog }) => {
-  const handleConfirm = () => {
-    closeDialog(); // Close the dialog
-    onConfirm(); // Call the onConfirm function on confirm
-  };
-
   useEffect(() => {
     if (dialogVisible) {
       confirmAlert({
@@ -27,12 +22,12 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ message, onConfirm, dialo
           },
           {
             label: 'Confirm',
-            onClick: handleConfirm,
+            onClick: onConfirm,
           },
         ],
       });
     }
-  }, [dialogVisible, closeDialog, handleConfirm, message]);
+  }, [dialogVisible, closeDialog, onConfirm, message]);
 
   return null; // The component doesn't render anything directly
 };

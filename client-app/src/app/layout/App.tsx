@@ -1,50 +1,23 @@
-import React, { Fragment, useEffect } from 'react';
-import { Header, Container } from 'semantic-ui-react';
+import { Container } from 'semantic-ui-react';
 import NavBar from './navbar';
-import ActivityDashboard from '../../features/activities/dashboard/ActivityDashboard';
-import LoadingComponent from './LoadingComponents';
-import { useStore } from '../stores/store';
 import { observer } from 'mobx-react-lite';
+import { Outlet, useLocation } from 'react-router-dom';
+import HomePage from '../../features/home/HomePage';
 
 function App() {
-  const {activityStore} = useStore();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      await activityStore.loadActivities();
-    };
-
-    fetchData();
-  }, [activityStore]);
-
+  const location = useLocation();
 
   return (
-    <Fragment>
-      <NavBar />
-
-      {activityStore.loadingInitial === false ? (
-        <div>
+    <>
+      {location.pathname === "/" ? <HomePage/> : (
+        <>
+        <NavBar />
           <Container style={{ marginTop: '7em' }}>
-            <Header as="h1" content="Reactivities" icon="users" />
-            <ActivityDashboard/>
+            <Outlet />
           </Container>
-        </div>
-      ) :
-        // <Segment textAlign='center' style={{ width: '100%', height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        //   <Puff
-        //     height="80"
-        //     width="80"
-        //     radius={1}
-        //     color="#4fa94d"
-        //     ariaLabel="puff-loading"
-        //     wrapperStyle={{}}
-        //     wrapperClass=""
-        //     visible={true}
-        //   />
-        // </Segment>
-        <LoadingComponent content='Loading app'/>
-      }
-    </Fragment>
+        </>
+      )}
+      </>
   );
 }
 
