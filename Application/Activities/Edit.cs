@@ -1,4 +1,5 @@
 using System.Data;
+using Application.Core;
 using AutoMapper;
 using Domain;
 using MediatR;
@@ -8,12 +9,12 @@ namespace Application.Activities
 {
     public class Edit
     {
-        public class Command : IRequest
+        public class Command : IRequest<Result<Unit>>
         {
             public Activity Activity { get; set; }
 
         }
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
             private readonly DataContext context;
             private readonly IMapper mapper;
@@ -25,17 +26,23 @@ namespace Application.Activities
             }
 
 
-            public async Task Handle(Command req, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command req, CancellationToken cancellationToken)
             {
                 var activity = await context.Activities.FindAsync(req.Activity.Id);
-                mapper.Map(req.Activity, activity);
-                // Console.WriteLine(activity.Title);
-                if (activity.Title == "null")
+                if(activity == null)
                 {
-                    throw new DataException("One of the worst input I have ever seen");
+                    return null;
                 }
-                // activity.Title = req.Activity.Title ?? activity.Title;
-                await context.SaveChangesAsync();
+
+                mapper.Map(req.Activity, activity);
+
+                var result = await context.SaveChangesAsync();
+                if(result == 0)
+                {
+                    return Result<Unit>.Failure("Failed to update activity");
+                }
+                return Result<Unit>.Success(Unit.Value);
+
             }
         }
 
